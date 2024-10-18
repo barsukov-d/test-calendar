@@ -41,18 +41,120 @@
 					<!-- <HelloWorld/> -->
 				</div>
 			</v-container>
-
-			<pre>{{ meetingDays }}</pre>
-			<pre>{{ birthdayDays }}</pre>
-			<pre>{{ holidayDays }}</pre>
 		</v-main>
 
-		<v-dialog v-model="addEventDialog" max-width="500px">
+		<!-- <v-dialog v-model="addEventDialog" max-width="500px">
 			<v-card>
 				<v-card-title>
 					<span class="headline">Добавить событие</span>
 				</v-card-title>
 				<v-card-text>
+					<v-form ref="form" @submit.prevent="submitEvent">
+						<v-text-field
+							label="Название события"
+							v-model="formData.eventName"
+							required
+						></v-text-field>
+						<v-textarea label="Описание" v-model="formData.description"></v-textarea>
+						<v-select
+							:items="eventTypes"
+							item-text="text"
+							item-value="value"
+							label="Тип события"
+							v-model="formData.type"
+							required
+						></v-select>
+						<v-menu
+							v-model="startTimeMenu"
+							:close-on-content-click="false"
+							transition="scale-transition"
+							offset-y
+							min-width="auto"
+						>
+							<template v-slot:activator="{ on, attrs }">
+								<v-text-field
+									v-model="formData.startTime"
+									label="Время начала"
+									prepend-icon="mdi-clock"
+									readonly
+									v-bind="attrs"
+									v-on="on"
+									required
+								></v-text-field>
+							</template>
+							<v-time-picker
+								v-model="formData.startTime"
+								@click:minute="startTimeMenu = false"
+							></v-time-picker>
+						</v-menu>
+						<v-menu
+							v-model="endTimeMenu"
+							:close-on-content-click="false"
+							transition="scale-transition"
+							offset-y
+							min-width="auto"
+						>
+							<template v-slot:activator="{ on, attrs }">
+								<v-text-field
+									v-model="formData.endTime"
+									label="Время окончания"
+									prepend-icon="mdi-clock"
+									readonly
+									v-bind="attrs"
+									v-on="on"
+									required
+								></v-text-field>
+							</template>
+							<v-time-picker
+								v-model="formData.endTime"
+								@click:minute="endTimeMenu = false"
+							></v-time-picker>
+						</v-menu>
+					</v-form>
+				</v-card-text>
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn color="blue darken-1" text @click="closeAddEventDialog">Отмена</v-btn>
+					<v-btn color="blue darken-1" text @click="submitEvent">Сохранить</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog> -->
+
+		<v-dialog v-model="addEventDialog" max-width="500px">
+			<v-card>
+				<v-card-title>
+					<span class="headline">События на {{ date }}</span>
+				</v-card-title>
+				<v-card-text>
+					<!-- Список существующих событий -->
+					<div v-if="eventsForSelectedDate.length">
+						<v-list>
+							<v-list-item
+								v-for="(event, index) in eventsForSelectedDate"
+								:key="index"
+							>
+								<v-list-item-content>
+									<v-list-item-title>{{
+										event.formData.eventName
+									}}</v-list-item-title>
+									<v-list-item-subtitle>
+										{{ event.formData.startTime }} -
+										{{ event.formData.endTime }} ({{
+											getEventTypeText(event.formData.type)
+										}})
+									</v-list-item-subtitle>
+								</v-list-item-content>
+								<v-list-item-action>
+									<v-icon :color="event.color">mdi-circle</v-icon>
+								</v-list-item-action>
+							</v-list-item>
+						</v-list>
+					</div>
+					<div v-else>
+						<p>Нет событий на эту дату.</p>
+					</div>
+					<h4>Новое событие</h4>
+					<!-- Форма добавления нового события -->
 					<v-form ref="form" @submit.prevent="submitEvent">
 						<v-text-field
 							label="Название события"
@@ -189,18 +291,22 @@ export default {
 		holidayDays() {
 			return this.daysByEventType.holidayDays
 		},
+
+		// Вычисляемое свойство для получения событий выбранной даты
+		eventsForSelectedDate() {
+			return this.arrayEvents.filter((event) => event.date === this.selectedDate)
+		},
 	},
 
 	methods: {
 		functionEvents(date) {
-			// const [, , day] = date.split('-')
-			// const dayNum = parseInt(day, 10)
-			const colors = []
-
-			if (this.meetingDays.includes(date)) colors.push('green')
-			if (this.birthdayDays.includes(date)) colors.push('blue')
-			if (this.holidayDays.includes(date)) colors.push('red')
-
+			// Фильтруем события по выбранной дате
+			const events = this.arrayEvents.filter((event) => event.formData.date === date)
+			// Получаем цвета на основе типа события
+			const colors = events.map((event) => {
+				const eventType = this.eventTypes.find((type) => type.value === event.formData.type)
+				return eventType ? eventType.color : '#9E9E9E' // Серый по умолчанию
+			})
 			return colors.length > 0 ? colors : false
 		},
 
@@ -232,7 +338,7 @@ export default {
 			) {
 				this.arrayEvents.push({
 					date: this.formData.date,
-					// color: this.getEventColor(this.formData.type),
+					color: this.getEventColor(this.formData.type),
 					formData: this.formData,
 				})
 				this.closeAddEventDialog()
@@ -241,10 +347,16 @@ export default {
 				alert('Пожалуйста, заполните все обязательные поля.')
 			}
 		},
-		// getEventColor(eventType) {
-		// 	const event = this.eventTypes.find((et) => et.value === eventType)
-		// 	return event ? event.color : '#9E9E9E' // Серый по умолчанию
-		// },
+		getEventTypeText(type) {
+			console.log('getEventTypeText, type:', type)
+
+			const event = this.eventTypes.find((et) => et.value === type)
+			return event ? event.text : 'Неизвестный тип'
+		},
+		getEventColor(eventType) {
+			const event = this.eventTypes.find((et) => et.value === eventType)
+			return event ? event.color : '#9E9E9E' // Серый по умолчанию
+		},
 		// getEventColorForDate(date) {
 		// 	const matchingEvents = this.arrayEvents.filter((event) => event.date === date)
 		// 	if (matchingEvents.length === 0) return false
