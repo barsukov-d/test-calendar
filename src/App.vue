@@ -41,6 +41,7 @@
 					<!-- <HelloWorld/> -->
 				</div>
 			</v-container>
+			<pre>{{ arrayEvents }}</pre>
 		</v-main>
 
 		<!-- <v-dialog v-model="addEventDialog" max-width="500px">
@@ -247,6 +248,7 @@ export default {
 		addEventDialog: false,
 		startTimeMenu: false,
 		endTimeMenu: false,
+		selectedDate: null,
 		formData: {
 			eventName: '',
 			description: '',
