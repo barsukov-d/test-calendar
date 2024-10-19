@@ -344,14 +344,11 @@ export default {
 					formData: this.formData,
 				})
 				this.closeAddEventDialog()
-				console.log('this.arrayEvents', this.arrayEvents)
 			} else {
 				alert('Пожалуйста, заполните все обязательные поля.')
 			}
 		},
 		getEventTypeText(type) {
-			console.log('getEventTypeText, type:', type)
-
 			const event = this.eventTypes.find((et) => et.value === type)
 			return event ? event.text : 'Неизвестный тип'
 		},
