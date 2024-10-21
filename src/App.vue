@@ -38,88 +38,9 @@
 						@click:date="openAddEventDialog"
 						:events="functionEvents"
 					></v-date-picker>
-					<!-- <HelloWorld/> -->
 				</div>
 			</v-container>
-			<pre>{{ arrayEvents }}</pre>
 		</v-main>
-
-		<!-- <v-dialog v-model="addEventDialog" max-width="500px">
-			<v-card>
-				<v-card-title>
-					<span class="headline">Добавить событие</span>
-				</v-card-title>
-				<v-card-text>
-					<v-form ref="form" @submit.prevent="submitEvent">
-						<v-text-field
-							label="Название события"
-							v-model="formData.eventName"
-							required
-						></v-text-field>
-						<v-textarea label="Описание" v-model="formData.description"></v-textarea>
-						<v-select
-							:items="eventTypes"
-							item-text="text"
-							item-value="value"
-							label="Тип события"
-							v-model="formData.type"
-							required
-						></v-select>
-						<v-menu
-							v-model="startTimeMenu"
-							:close-on-content-click="false"
-							transition="scale-transition"
-							offset-y
-							min-width="auto"
-						>
-							<template v-slot:activator="{ on, attrs }">
-								<v-text-field
-									v-model="formData.startTime"
-									label="Время начала"
-									prepend-icon="mdi-clock"
-									readonly
-									v-bind="attrs"
-									v-on="on"
-									required
-								></v-text-field>
-							</template>
-							<v-time-picker
-								v-model="formData.startTime"
-								@click:minute="startTimeMenu = false"
-							></v-time-picker>
-						</v-menu>
-						<v-menu
-							v-model="endTimeMenu"
-							:close-on-content-click="false"
-							transition="scale-transition"
-							offset-y
-							min-width="auto"
-						>
-							<template v-slot:activator="{ on, attrs }">
-								<v-text-field
-									v-model="formData.endTime"
-									label="Время окончания"
-									prepend-icon="mdi-clock"
-									readonly
-									v-bind="attrs"
-									v-on="on"
-									required
-								></v-text-field>
-							</template>
-							<v-time-picker
-								v-model="formData.endTime"
-								@click:minute="endTimeMenu = false"
-							></v-time-picker>
-						</v-menu>
-					</v-form>
-				</v-card-text>
-				<v-card-actions>
-					<v-spacer></v-spacer>
-					<v-btn color="blue darken-1" text @click="closeAddEventDialog">Отмена</v-btn>
-					<v-btn color="blue darken-1" text @click="submitEvent">Сохранить</v-btn>
-				</v-card-actions>
-			</v-card>
-		</v-dialog> -->
 
 		<v-dialog v-model="addEventDialog" max-width="500px">
 			<v-card>
